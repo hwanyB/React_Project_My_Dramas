@@ -11,6 +11,7 @@ import {
 export default function App() {
   const [working, setWorking] = useState(true);
   const [toDoText, setToDoText] = useState("");
+  const [toDos, setToDos] = useState({});
   const goTravel = () => setWorking(false);
   const goWork = () => setWorking(true);
 
@@ -21,11 +22,15 @@ export default function App() {
   const addToDo = () => {
     if (toDoText === "") {
       return;
-    } else {
-      alert(toDoText);
-      setToDoText("");
     }
+    const newToDos = Object.assign({}, toDos, {
+      [Date.now()]: { toDoText, work: working },
+    });
+    setToDos(newToDos);
+    setToDoText("");
+    console.log(newToDos);
   };
+
   return (
     <View style={styles.container}>
       <StatusBar style='auto' />
