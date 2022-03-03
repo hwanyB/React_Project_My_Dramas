@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
@@ -6,8 +6,11 @@ import {
   View,
   TouchableOpacity,
   TextInput,
-  ScrollView
+  ScrollView,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const STORAGE_KEY = "@toDos";
 
 export default function App() {
   const [working, setWorking] = useState(true);
@@ -16,25 +19,47 @@ export default function App() {
   const goTravel = () => setWorking(false);
   const goWork = () => setWorking(true);
 
+  useEffect(() => {
+    loadToDos();
+  }, []);
+
   const onChangeToDo = (payload) => {
     setToDoText(payload);
   };
 
-  const addToDo = () => {
+  const saveToDos = async (toSave) => {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+    } catch (error) {
+      console.log("MESSAGE", error.message);
+    }
+  };
+
+  const loadToDos = async () => {
+    try {
+      const s = await AsyncStorage.getItem(STORAGE_KEY);
+      s !== null ? setToDos(JSON.parse(s)) : null;
+    } catch (error) {
+      console.log("MESSAGE", error.message);
+    }
+  };
+
+  const addToDo = async () => {
     if (toDoText === "") {
       return;
     }
     const newToDos = Object.assign({}, toDos, {
-      [Date.now()]: { toDoText, work: working },
+      [Date.now()]: { toDoText, working },
     });
     setToDos(newToDos);
+    await saveToDos(newToDos);
     setToDoText("");
     console.log(newToDos);
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar style='auto' />
+      <StatusBar style='light' />
       <View style={styles.header}>
         <TouchableOpacity>
           <Text
@@ -59,22 +84,21 @@ export default function App() {
           onSubmitEditing={addToDo}
           onChangeText={onChangeToDo}
           value={toDoText}
-          autoCapitalize='sentence'
+          autoCapitalize='sentences'
           placeholder={working ? "Add a task" : "Where do you want to go?"}
           style={styles.input}
-          auto
+          placeholderTextColor='#fff'
         />
         <ScrollView style={styles.toDoWrapper}>
-          {
-            Object.keys(toDos).map(key => (
+          {Object.keys(toDos).map((key) =>
+            toDos[key].working === working ? (
               <View key={key} style={styles.toDo}>
                 <Text style={styles.toDoText}>{toDos[key].toDoText}</Text>
               </View>
-            ))
-          }
+            ) : null
+          )}
         </ScrollView>
       </View>
-
     </View>
   );
 }
@@ -108,25 +132,24 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     color: "#fff",
     fontSize: 20,
-    fontWeight: 400,
+    fontWeight: "400",
     paddingVertical: 10,
     paddingHorizontal: 20,
     backgroundColor: "#283ac7",
-    placeholderTextColor: "#fff",
   },
-  toDoWrapper : {
-    marginTop:30,
+  toDoWrapper: {
+    marginTop: 30,
   },
   toDo: {
-    marginBottom:10,
+    marginBottom: 10,
+    borderRadius: 5,
+    backgroundColor: "#fff",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
   },
   toDoText: {
     fontSize: 20,
-    fontWeight:"600",
-    backgroundColor:"#fff",
-    color:"#283ac7",
-    borderRadius:5,
-    paddingVertical: 10,
-    paddingHorizontal:20,
-  }
+    fontWeight: "600",
+    color: "#283ac7",
+  },
 });
