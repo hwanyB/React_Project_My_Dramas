@@ -6,6 +6,7 @@ import {
   View,
   TouchableOpacity,
   TextInput,
+  ScrollView
 } from "react-native";
 
 export default function App() {
@@ -63,7 +64,17 @@ export default function App() {
           style={styles.input}
           auto
         />
+        <ScrollView style={styles.toDoWrapper}>
+          {
+            Object.keys(toDos).map(key => (
+              <View key={key} style={styles.toDo}>
+                <Text style={styles.toDoText}>{toDos[key].toDoText}</Text>
+              </View>
+            ))
+          }
+        </ScrollView>
       </View>
+
     </View>
   );
 }
@@ -86,7 +97,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   main: {
-    backgroundColor: "#fff",
+    backgroundColor: "#edeff7",
     flex: 10,
     paddingHorizontal: 30,
     borderTopStartRadius: 25,
@@ -103,4 +114,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#283ac7",
     placeholderTextColor: "#fff",
   },
+  toDoWrapper : {
+    marginTop:30,
+  },
+  toDo: {
+    marginBottom:10,
+  },
+  toDoText: {
+    fontSize: 20,
+    fontWeight:"600",
+    backgroundColor:"#fff",
+    color:"#283ac7",
+    borderRadius:5,
+    paddingVertical: 10,
+    paddingHorizontal:20,
+  }
 });
