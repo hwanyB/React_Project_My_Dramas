@@ -7,8 +7,10 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { FontAwesome } from "@expo/vector-icons";
 
 const STORAGE_KEY = "@toDos";
 
@@ -56,6 +58,19 @@ export default function App() {
     setToDoText("");
     console.log(newToDos);
   };
+  const deleteToDo = (key) => {
+    Alert.alert("Delete To Do", "Are you sure?",[
+      { text : "Cancel" },
+      { text: "Delete",
+      onPress: async () => {
+        const newToDos = {...toDos};
+        delete newToDos[key];
+        setToDos(newToDos);
+        await saveToDos(newToDos);
+      },},
+    ]);
+    
+  };
 
   return (
     <View style={styles.container}>
@@ -94,6 +109,9 @@ export default function App() {
             toDos[key].working === working ? (
               <View key={key} style={styles.toDo}>
                 <Text style={styles.toDoText}>{toDos[key].toDoText}</Text>
+                <TouchableOpacity onPress={() => deleteToDo(key)}>
+                  <FontAwesome name='trash' size={20} color='#283ac7' />
+                </TouchableOpacity>
               </View>
             ) : null
           )}
@@ -144,8 +162,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 5,
     backgroundColor: "#fff",
-    paddingVertical: 10,
+    paddingVertical: 15,
     paddingHorizontal: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   toDoText: {
     fontSize: 20,
