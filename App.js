@@ -18,6 +18,8 @@ export default function App() {
   const [working, setWorking] = useState(true);
   const [toDoText, setToDoText] = useState("");
   const [toDos, setToDos] = useState({});
+  const [done, setDone] = useState(false);
+
   const goTravel = () => setWorking(false);
   const goWork = () => setWorking(true);
 
@@ -51,25 +53,55 @@ export default function App() {
       return;
     }
     const newToDos = Object.assign({}, toDos, {
-      [Date.now()]: { toDoText, working },
+      [Date.now()]: { toDoText, working, done },
     });
     setToDos(newToDos);
     await saveToDos(newToDos);
     setToDoText("");
-    console.log(newToDos);
+    // console.log(newToDos);
   };
   const deleteToDo = (key) => {
-    Alert.alert("Delete To Do", "Are you sure?",[
-      { text : "Cancel" },
-      { text: "Delete",
-      onPress: async () => {
-        const newToDos = {...toDos};
-        delete newToDos[key];
-        setToDos(newToDos);
-        await saveToDos(newToDos);
-      },},
+    Alert.alert("Delete To Do", "Are you sure?", [
+      { text: "Cancel" },
+      {
+        text: "Delete",
+        onPress: async () => {
+          const newToDos = { ...toDos };
+          delete newToDos[key];
+          setToDos(newToDos);
+          await saveToDos(newToDos);
+        },
+      },
     ]);
-    
+  };
+
+  const toggleToDo = (key) => {
+    const newToDos = { ...toDos };
+    if(newToDos[key].done === false){
+      Alert.alert("Finish To Do", "Are you done with this work?", [
+        { text: "Cancel" },
+        {
+          text: "Finish",
+          onPress: async () => {
+            newToDos[key].done = true;
+            setToDos(newToDos);
+            await saveToDos(newToDos);
+          },
+        },
+      ]);
+    }else{
+      Alert.alert("Cancle Done", "Are you sure?", [
+        { text: "Cancel" },
+        {
+          text: "Sure",
+          onPress: async () => {
+            newToDos[key].done = false;
+            setToDos(newToDos);
+            await saveToDos(newToDos);
+          },
+        },
+      ]);
+    }
   };
 
   return (
@@ -106,9 +138,22 @@ export default function App() {
         />
         <ScrollView style={styles.toDoWrapper}>
           {Object.keys(toDos).map((key) =>
-            toDos[key].working === working ? (
+            toDos[key].working ? (
               <View key={key} style={styles.toDo}>
-                <Text style={styles.toDoText}>{toDos[key].toDoText}</Text>
+                <TouchableOpacity onPress={() => toggleToDo(key)}>
+                  <FontAwesome name='check' size={20} color='#283ac7' />
+                </TouchableOpacity>
+                <Text
+                  style={[
+                    styles.toDoText,
+                    {
+                      textDecorationLine:
+                        toDos[key].done === true ? "line-through" : "none",
+                    },
+                  ]}
+                >
+                  {toDos[key].toDoText}
+                </Text>
                 <TouchableOpacity onPress={() => deleteToDo(key)}>
                   <FontAwesome name='trash' size={20} color='#283ac7' />
                 </TouchableOpacity>
@@ -171,5 +216,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
     color: "#283ac7",
+    alignSelf: "flex-start",
   },
 });
