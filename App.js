@@ -17,8 +17,8 @@ const STORAGE_KEY = "@toDos";
 export default function App() {
   const [working, setWorking] = useState(true);
   const [toDoText, setToDoText] = useState("");
+  const [editToDoText, setEditToDoText] = useState("");
   const [toDos, setToDos] = useState({});
-  const [done, setDone] = useState(false);
 
   const goTravel = () => setWorking(false);
   const goWork = () => setWorking(true);
@@ -29,6 +29,9 @@ export default function App() {
 
   const onChangeToDo = (payload) => {
     setToDoText(payload);
+  };
+  const onChangeEditToDo = (payload) => {
+    setEditToDoText(payload);
   };
 
   const saveToDos = async (toSave) => {
@@ -53,12 +56,11 @@ export default function App() {
       return;
     }
     const newToDos = Object.assign({}, toDos, {
-      [Date.now()]: { toDoText, working, done },
+      [Date.now()]: { toDoText, working, done, edit },
     });
     setToDos(newToDos);
     await saveToDos(newToDos);
     setToDoText("");
-    // console.log(newToDos);
   };
   const deleteToDo = (key) => {
     Alert.alert("Delete To Do", "Are you sure?", [
@@ -77,31 +79,30 @@ export default function App() {
 
   const toggleToDo = (key) => {
     const newToDos = { ...toDos };
-    if(newToDos[key].done === false){
-      Alert.alert("Finish To Do", "Are you done with this work?", [
-        { text: "Cancel" },
-        {
-          text: "Finish",
-          onPress: async () => {
-            newToDos[key].done = true;
-            setToDos(newToDos);
-            await saveToDos(newToDos);
-          },
-        },
-      ]);
-    }else{
-      Alert.alert("Cancle Done", "Are you sure?", [
+    Alert.alert(
+      newToDos[key].done === false ? "Finish To Do" : "Cancle Done",
+      "Are you sure?",
+      [
         { text: "Cancel" },
         {
           text: "Sure",
           onPress: async () => {
-            newToDos[key].done = false;
+            newToDos[key].done = !newToDos[key].done;
             setToDos(newToDos);
             await saveToDos(newToDos);
           },
         },
-      ]);
-    }
+      ]
+    );
+  };
+
+  const editToDo = async (key) => {
+    const newToDos = { ...toDos };
+    newToDos[key].edit = !newToDos[key].edit;
+    newToDos[key].toDoText = editToDoText
+    setToDos(newToDos);
+    await saveToDos(newToDos);
+    console.log(newToDos);
   };
 
   return (
@@ -138,23 +139,39 @@ export default function App() {
         />
         <ScrollView style={styles.toDoWrapper}>
           {Object.keys(toDos).map((key) =>
-            toDos[key].working ? (
+            toDos[key].working === working ? (
               <View key={key} style={styles.toDo}>
-                <TouchableOpacity onPress={() => toggleToDo(key)}>
+                <TouchableOpacity
+                  onPress={() => toggleToDo(key)}
+                  style={{ flex: 1 }}
+                >
                   <FontAwesome name='check' size={20} color='#283ac7' />
                 </TouchableOpacity>
-                <Text
-                  style={[
-                    styles.toDoText,
-                    {
-                      textDecorationLine:
-                        toDos[key].done === true ? "line-through" : "none",
-                    },
-                  ]}
+                {toDos[key].edit === false ? (
+                  <Text
+                    style={[
+                      styles.toDoText,
+                      {
+                        textDecorationLine:
+                          toDos[key].done === true ? "line-through" : "none",
+                      },
+                    ]}
+                  >
+                    {toDos[key].toDoText}
+                  </Text>
+                ) : (
+                  <TextInput onChangeText={onChangeEditToDo} autoFocus={true} style={styles.editInput} placeholder={toDos[key].toDoText} value={editToDoText} />
+                )}
+                <TouchableOpacity
+                  style={{ flex: 1, alignItems: "flex-end" }}
+                  onPress={() => editToDo(key)}
                 >
-                  {toDos[key].toDoText}
-                </Text>
-                <TouchableOpacity onPress={() => deleteToDo(key)}>
+                  <FontAwesome name={toDos[key].edit === true ? 'check-square-o' : 'pencil'} size={20} color='#283ac7' />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ flex: 1, alignItems: "flex-end" }}
+                  onPress={() => deleteToDo(key)}
+                >
                   <FontAwesome name='trash' size={20} color='#283ac7' />
                 </TouchableOpacity>
               </View>
@@ -211,11 +228,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     flexDirection: "row",
     justifyContent: "space-between",
+    flex: 1,
   },
   toDoText: {
     fontSize: 20,
     fontWeight: "600",
     color: "#283ac7",
-    alignSelf: "flex-start",
+    flex: 4,
+  },
+  editInput:{
+    flex: 4,
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#283ac7",
+    borderBottomColor:"#283ac7",
+    borderBottomWidth:1,
   },
 });
