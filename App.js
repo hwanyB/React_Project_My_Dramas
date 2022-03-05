@@ -16,12 +16,17 @@ const STORAGE_KEY = "@toDos";
 
 export default function App() {
   const [working, setWorking] = useState(true);
+  const [doneState, setDoneState] = useState(false);
   const [toDoText, setToDoText] = useState("");
   const [editToDoText, setEditToDoText] = useState("");
   const [toDos, setToDos] = useState({});
+  const [showText, setShowText] = useState(false);
 
   const goTravel = () => setWorking(false);
   const goWork = () => setWorking(true);
+
+  const done = false;
+  const edit = false;
 
   useEffect(() => {
     loadToDos();
@@ -77,6 +82,10 @@ export default function App() {
     ]);
   };
 
+  const onShowTextPress = () => {
+    setShowText(!showText);
+  };
+
   const toggleToDo = (key) => {
     const newToDos = { ...toDos };
     Alert.alert(
@@ -96,10 +105,14 @@ export default function App() {
     );
   };
 
+  const toggleSeeDone = () => {
+    setDoneState(!doneState);
+  };
+
   const editToDo = async (key) => {
     const newToDos = { ...toDos };
     newToDos[key].edit = !newToDos[key].edit;
-    newToDos[key].toDoText = editToDoText
+    newToDos[key].toDoText = editToDoText;
     setToDos(newToDos);
     await saveToDos(newToDos);
     console.log(newToDos);
@@ -137,9 +150,33 @@ export default function App() {
           style={styles.input}
           placeholderTextColor='#fff'
         />
+        <View style={styles.sideIconWrapper}>
+          {showText && (
+            <View style={{marginRight:20}}>
+              <Text style={{color:"#283ac7", fontSize:15,fontWeight:"300"}}>
+                {working ? "See Finished Tasks" : "See Where I've Been"}
+              </Text>
+            </View>
+          )}
+          <TouchableOpacity
+            style={{ marginRight: 10 }}
+            onPressIn={onShowTextPress}
+            onPressOut={onShowTextPress}
+          >
+            <FontAwesome name='question-circle-o' size={15} color='#283ac7' />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <FontAwesome
+              name={doneState ? "toggle-on" : "toggle-off"}
+              size={30}
+              color='#283ac7'
+              onPress={toggleSeeDone}
+            />
+          </TouchableOpacity>
+        </View>
         <ScrollView style={styles.toDoWrapper}>
           {Object.keys(toDos).map((key) =>
-            toDos[key].working === working ? (
+            toDos[key].working === working && toDos[key].done === doneState ? (
               <View key={key} style={styles.toDo}>
                 <TouchableOpacity
                   onPress={() => toggleToDo(key)}
@@ -148,25 +185,39 @@ export default function App() {
                   <FontAwesome name='check' size={20} color='#283ac7' />
                 </TouchableOpacity>
                 {toDos[key].edit === false ? (
-                  <Text
-                    style={[
-                      styles.toDoText,
-                      {
-                        textDecorationLine:
-                          toDos[key].done === true ? "line-through" : "none",
-                      },
-                    ]}
-                  >
-                    {toDos[key].toDoText}
-                  </Text>
+                  <TouchableOpacity style={{ flex: 4 }}>
+                    <Text
+                      style={[
+                        styles.toDoText,
+                        {
+                          textDecorationLine:
+                            toDos[key].done === true ? "line-through" : "none",
+                        },
+                      ]}
+                    >
+                      {toDos[key].toDoText}
+                    </Text>
+                  </TouchableOpacity>
                 ) : (
-                  <TextInput onChangeText={onChangeEditToDo} autoFocus={true} style={styles.editInput} placeholder={toDos[key].toDoText} value={editToDoText} />
+                  <TextInput
+                    onChangeText={onChangeEditToDo}
+                    autoFocus={true}
+                    style={styles.editInput}
+                    placeholder={toDos[key].toDoText}
+                    value={editToDoText}
+                  />
                 )}
                 <TouchableOpacity
                   style={{ flex: 1, alignItems: "flex-end" }}
                   onPress={() => editToDo(key)}
                 >
-                  <FontAwesome name={toDos[key].edit === true ? 'check-square-o' : 'pencil'} size={20} color='#283ac7' />
+                  <FontAwesome
+                    name={
+                      toDos[key].edit === true ? "check-square-o" : "pencil"
+                    }
+                    size={20}
+                    color='#283ac7'
+                  />
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={{ flex: 1, alignItems: "flex-end" }}
@@ -218,7 +269,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#283ac7",
   },
   toDoWrapper: {
-    marginTop: 30,
+    marginTop: 10,
+    flex: 1,
   },
   toDo: {
     marginBottom: 10,
@@ -234,14 +286,19 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
     color: "#283ac7",
-    flex: 4,
   },
-  editInput:{
+  editInput: {
     flex: 4,
     fontSize: 20,
     fontWeight: "600",
     color: "#283ac7",
-    borderBottomColor:"#283ac7",
-    borderBottomWidth:1,
+    borderBottomColor: "#283ac7",
+    borderBottomWidth: 1,
+  },
+  sideIconWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    marginTop: 15,
   },
 });
