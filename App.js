@@ -124,18 +124,18 @@ export default function App() {
       <View style={styles.header}>
         <TouchableOpacity>
           <Text
-            style={[styles.btnText, { color: working ? "#fff" : "#4154e0" }]}
+            style={[styles.btnText, { color: working ? "#171717" : "#17171780" }]}
             onPress={goWork}
           >
-            Work
+            work
           </Text>
         </TouchableOpacity>
         <TouchableOpacity>
           <Text
-            style={[styles.btnText, { color: !working ? "#fff" : "#4154e0" }]}
+            style={[styles.btnText, { color: !working ? "#171717" : "#17171780" }]}
             onPress={goTravel}
           >
-            Travel
+            travel
           </Text>
         </TouchableOpacity>
       </View>
@@ -148,12 +148,11 @@ export default function App() {
           autoCapitalize='sentences'
           placeholder={working ? "Add a task" : "Where do you want to go?"}
           style={styles.input}
-          placeholderTextColor='#fff'
         />
         <View style={styles.sideIconWrapper}>
           {showText && (
             <View style={{marginRight:20}}>
-              <Text style={{color:"#283ac7", fontSize:15,fontWeight:"300"}}>
+              <Text style={{color:"#171717", fontSize:12,fontWeight:"300"}}>
                 {working ? "See Finished Tasks" : "See Where I've Been"}
               </Text>
             </View>
@@ -163,13 +162,13 @@ export default function App() {
             onPressIn={onShowTextPress}
             onPressOut={onShowTextPress}
           >
-            <FontAwesome name='question-circle-o' size={15} color='#283ac7' />
+            <FontAwesome name='question-circle-o' size={15} color='#171717' />
           </TouchableOpacity>
           <TouchableOpacity>
             <FontAwesome
               name={doneState ? "toggle-on" : "toggle-off"}
               size={30}
-              color='#283ac7'
+              color='#171717'
               onPress={toggleSeeDone}
             />
           </TouchableOpacity>
@@ -182,7 +181,7 @@ export default function App() {
                   onPress={() => toggleToDo(key)}
                   style={{ flex: 1 }}
                 >
-                  <FontAwesome name='check' size={20} color='#283ac7' />
+                  <FontAwesome name='check' size={20} color='#00FF75' />
                 </TouchableOpacity>
                 {toDos[key].edit === false ? (
                   <TouchableOpacity style={{ flex: 4 }}>
@@ -199,6 +198,8 @@ export default function App() {
                     </Text>
                   </TouchableOpacity>
                 ) : (
+                  <TouchableOpacity style={{ flex: 4 }}>
+
                   <TextInput
                     onChangeText={onChangeEditToDo}
                     autoFocus={true}
@@ -206,6 +207,8 @@ export default function App() {
                     placeholder={toDos[key].toDoText}
                     value={editToDoText}
                   />
+                  </TouchableOpacity>
+
                 )}
                 <TouchableOpacity
                   style={{ flex: 1, alignItems: "flex-end" }}
@@ -216,14 +219,14 @@ export default function App() {
                       toDos[key].edit === true ? "check-square-o" : "pencil"
                     }
                     size={20}
-                    color='#283ac7'
+                    color='#00FF75'
                   />
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={{ flex: 1, alignItems: "flex-end" }}
                   onPress={() => deleteToDo(key)}
                 >
-                  <FontAwesome name='trash' size={20} color='#283ac7' />
+                  <FontAwesome name='trash' size={20} color='#00FF75' />
                 </TouchableOpacity>
               </View>
             ) : null
@@ -237,7 +240,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#283ac7",
+    backgroundColor: "#00FF75",
   },
   header: {
     flex: 0.5,
@@ -249,24 +252,24 @@ const styles = StyleSheet.create({
   },
   btnText: {
     fontSize: 25,
-    fontWeight: "700",
+    fontWeight: "900",
   },
   main: {
-    backgroundColor: "#edeff7",
+    backgroundColor: "#F8F8F8",
     flex: 10,
-    paddingHorizontal: 30,
+    padding: 20,
     borderTopStartRadius: 25,
     borderTopRightRadius: 25,
   },
   input: {
-    marginTop: 40,
-    borderRadius: 25,
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "400",
-    paddingVertical: 10,
+    borderRadius: 15,
+    color: "#171717",
+    fontSize: 18,
+    fontWeight: "300",
+    paddingVertical: 8,
     paddingHorizontal: 20,
-    backgroundColor: "#283ac7",
+    borderColor: "#171717",
+    borderWidth: 1,
   },
   toDoWrapper: {
     marginTop: 10,
@@ -274,8 +277,8 @@ const styles = StyleSheet.create({
   },
   toDo: {
     marginBottom: 10,
-    borderRadius: 5,
-    backgroundColor: "#fff",
+    borderRadius: 15,
+    backgroundColor: "#171717",
     paddingVertical: 15,
     paddingHorizontal: 20,
     flexDirection: "row",
@@ -283,17 +286,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   toDoText: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#283ac7",
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#fff",
+    lineHeight: 20
+
   },
   editInput: {
-    flex: 4,
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#283ac7",
-    borderBottomColor: "#283ac7",
+    fontSize: 18,
+    fontWeight: "500",
+    color: "#fff",
+    borderBottomColor: "#fff",
     borderBottomWidth: 1,
+    lineHeight: 20,
+    flex: 4,
+    
   },
   sideIconWrapper: {
     flexDirection: "row",
